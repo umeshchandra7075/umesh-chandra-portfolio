@@ -9,56 +9,42 @@ export async function POST(req: NextRequest) {
 
     if (!name || !email || !message) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "All fields are required.",
-        },
+        { success: false, message: "All fields are required." },
         { status: 400 }
       );
     }
 
-    const { error } = await resend.emails.send({
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+    console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
+
+    const result = await resend.emails.send({
       from: "Portfolio <onboarding@resend.dev>",
       to: process.env.EMAIL_USER!,
       replyTo: email,
-      subject: `📩 New Portfolio Contact from ${name}`,
+      subject: `New Portfolio Contact from ${name}`,
       html: `
-        <div style="font-family:Arial,sans-serif;padding:20px;">
-          <h2 style="color:#2563eb;">New Portfolio Contact</h2>
-          <hr />
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Message:</strong></p>
-          <div style="background:#f5f5f5;padding:15px;border-radius:8px;">
-            ${message}
-          </div>
-        </div>
+        <h2>Portfolio Contact</h2>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Message:</b></p>
+        <p>${message}</p>
       `,
     });
 
-    if (error) {
-      console.error(error);
-
-      return NextResponse.json(
-        {
-          success: false,
-          message: error.message,
-        },
-        { status: 500 }
-      );
-    }
+    console.log(result);
 
     return NextResponse.json({
       success: true,
-      message: "Message sent successfully.",
+      message: "Email sent successfully",
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("FULL ERROR:");
+    console.error(error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Internal Server Error",
+        message: String(error),
       },
       { status: 500 }
     );
