@@ -14,6 +14,14 @@ app.use(
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Umesh Chandra Portfolio API is running 🚀",
+    status: "OK",
+  });
+});
+
 app.use("/api/contact", require("./routes/contact.routes"));
 
 app.listen(process.env.PORT || 5000, () => {
